@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      {% if validlink %}
+        <!-- حالت موفق -->
+        <div class="text-center p-4 border rounded bg-white">
+          <div class="mb-4">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+          </div>
+          <h2 class="mb-3">فعال‌سازی موفق</h2>
+          <p class="mb-4">حساب کاربری شما با موفقیت فعال شد.</p>
+          <a href="{% url 'accounts:login' %}" class="btn btn-primary">
+            <i class="bi bi-box-arrow-in-left"></i> ورود به حساب
+          </a>
+        </div>
+      {% else %}
+        <!-- حالت ناموفق -->
+        <div class="text-center p-4 border rounded bg-whi">
+          <div class="mb-4">
+            <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+          </div>
+          <h2 class="mb-3">خطا در فعال‌سازی</h2>
+          <p class="mb-4">لینک فعال‌سازی نامعتبر یا منقضی شده است.</p>
+          <div class="d-flex justify-content-center gap-2">
+            <a href="{% url 'accounts:register' %}" class="btn btn-primary">
+              <i class="bi bi-person-plus"></i> ثبت‌نام مجدد
+            </a>
+            <a href="{% url 'website:contact' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-headset"></i> پشتیبانی
+            </a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

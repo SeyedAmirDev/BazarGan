@@ -1,0 +1,112 @@
+{% load i18n %}
+
+{% block subject %}
+{% blocktrans %}فعال‌سازی حساب کاربری در {{ site_name }}{% endblocktrans %}
+{% endblock subject %}
+
+{% block text_body %}
+{% blocktrans %}این ایمیل به درخواست شما برای تکمیل فرآیند فعال‌سازی حساب در {{ site_name }} ارسال شده است.{% endblocktrans %}
+
+{% trans "لطفاً برای فعال‌سازی حساب خود به لینک زیر مراجعه کنید:" %}
+{{ protocol }}://{{ domain }}{% url 'accounts:activation_confirm' uidb64=uid token=token %}
+
+{% trans "با تشکر از استفاده شما از سایت ما" %}
+
+{% blocktrans %}تیم {{ site_name }}{% endblocktrans %}
+{% endblock text_body %}
+
+{% block html_body %}
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فعال‌سازی حساب کاربری</title>
+    <style>
+        body {
+            font-family: 'Vazirmatn', Tahoma, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .email-header {
+            background-color: #4a6baf;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .email-body {
+            padding: 30px;
+        }
+        .activation-button {
+            display: inline-block;
+            background-color: #4a6baf;
+            color: white !important;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .email-footer {
+            background-color: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+        .divider {
+            border-top: 1px solid #eee;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1>فعال‌سازی حساب کاربری</h1>
+        </div>
+
+        <div class="email-body">
+            <p>سلام،</p>
+
+            <p>این ایمیل به درخواست شما برای تکمیل فرآیند فعال‌سازی حساب در <strong>{{ site_name }}</strong> ارسال شده است.</p>
+
+            <p>لطفاً برای فعال‌سازی حساب خود روی دکمه زیر کلیک کنید:</p>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{ protocol }}://{{ domain }}{% url 'accounts:activation_confirm' uidb64=uid token=token %}" class="activation-button">
+                    فعال‌سازی حساب کاربری
+                </a>
+            </div>
+
+            <p>اگر دکمه بالا کار نمی‌کند، می‌توانید لینک زیر را در مرورگر خود کپی کنید:</p>
+
+            <p style="word-break: break-all; font-size: 14px; color: #666;">
+                {{ protocol }}://{{ domain }}{% url 'accounts:activation_confirm' uidb64=uid token=token %}
+            </p>
+
+            <div class="divider"></div>
+
+            <p>اگر شما این درخواست را انجام نداده‌اید، لطفاً این ایمیل را نادیده بگیرید.</p>
+        </div>
+
+        <div class="email-footer">
+            <p>با تشکر از شما برای انتخاب {{ site_name }}</p>
+            <p>© {% now "Y" %} {{ site_name }}. تمام حقوق محفوظ است.</p>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock html_body %}
