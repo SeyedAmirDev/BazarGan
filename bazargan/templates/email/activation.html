@@ -10,9 +10,9 @@
 {% trans "لطفاً برای فعال‌سازی حساب خود به لینک زیر مراجعه کنید:" %}
 {{ protocol }}://{{ domain }}{% url 'accounts:activation_confirm' uidb64=uid token=token %}
 
-{% trans "با تشکر از استفاده شما از سایت ما" %}
+{% trans "با تشکر از اعتماد شما" %}
 
-{% blocktrans %}تیم {{ site_name }}{% endblocktrans %}
+{% blocktrans %}تیم پشتیبانی {{ site_name }}{% endblocktrans %}
 {% endblock text_body %}
 
 {% block html_body %}
@@ -23,88 +23,163 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>فعال‌سازی حساب کاربری</title>
     <style>
+        @font-face {
+            font-family: 'Vazirmatn';
+            src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Regular.woff2') format('woff2');
+        }
         body {
             font-family: 'Vazirmatn', Tahoma, sans-serif;
             line-height: 1.6;
             color: #333;
-            background-color: #f9f9f9;
+            background-color: #f5f7fa;
             margin: 0;
             padding: 0;
         }
         .email-container {
             max-width: 600px;
-            margin: 0 auto;
+            margin: 20px auto;
             background-color: #ffffff;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
         .email-header {
-            background-color: #4a6baf;
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
             color: white;
-            padding: 20px;
+            padding: 30px 20px;
             text-align: center;
+            position: relative;
+        }
+        .email-header:after {
+            content: "";
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background-color: white;
+            border-radius: 0 0 12px 12px;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .email-logo {
+            max-width: 120px;
+            margin-bottom: 15px;
         }
         .email-body {
             padding: 30px;
         }
         .activation-button {
             display: inline-block;
-            background-color: #4a6baf;
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
             color: white !important;
             text-decoration: none;
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-weight: bold;
-            margin: 20px 0;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 25px 0;
             text-align: center;
+            box-shadow: 0 4px 12px rgba(107, 115, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        .activation-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(107, 115, 255, 0.4);
         }
         .email-footer {
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
             padding: 20px;
             text-align: center;
-            font-size: 12px;
-            color: #777;
+            font-size: 13px;
+            color: #666;
+            border-top: 1px solid #eee;
         }
         .divider {
-            border-top: 1px solid #eee;
-            margin: 20px 0;
+            border-top: 1px dashed #e0e0e0;
+            margin: 25px 0;
+        }
+        .link-text {
+            word-break: break-all;
+            font-size: 14px;
+            color: #666;
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            direction: ltr;
+            text-align: left;
+        }
+        .social-links {
+            margin-top: 20px;
+        }
+        .social-links a {
+            display: inline-block;
+            margin: 0 8px;
+        }
+        .social-icon {
+            width: 32px;
+            height: 32px;
         }
     </style>
 </head>
 <body>
     <div class="email-container">
         <div class="email-header">
+            <!-- لوگوی فروشگاه شما -->
+            <img src="https://example.com/logo.png" alt="{{ site_name }}" class="email-logo">
             <h1>فعال‌سازی حساب کاربری</h1>
         </div>
 
         <div class="email-body">
-            <p>سلام،</p>
+            <p>سلام عزیز،</p>
 
-            <p>این ایمیل به درخواست شما برای تکمیل فرآیند فعال‌سازی حساب در <strong>{{ site_name }}</strong> ارسال شده است.</p>
+            <p>به <strong>{{ site_name }}</strong> خوش آمدید! برای شروع خرید و استفاده از تمام امکانات، لطفاً حساب کاربری خود را فعال کنید.</p>
 
-            <p>لطفاً برای فعال‌سازی حساب خود روی دکمه زیر کلیک کنید:</p>
+            <p>برای تکمیل فرآیند ثبت‌نام، روی دکمه زیر کلیک کنید:</p>
 
-            <div style="text-align: center; margin: 30px 0;">
+            <div style="text-align: center;">
                 <a href="{{ protocol }}://{{ domain }}{% url 'accounts:activation_confirm' uidb64=uid token=token %}" class="activation-button">
                     فعال‌سازی حساب کاربری
                 </a>
             </div>
 
-            <p>اگر دکمه بالا کار نمی‌کند، می‌توانید لینک زیر را در مرورگر خود کپی کنید:</p>
+            <p>این لینک تا 24 ساعت آینده معتبر خواهد بود.</p>
 
-            <p style="word-break: break-all; font-size: 14px; color: #666;">
+            <div class="divider"></div>
+
+            <p>اگر دکمه بالا کار نمی‌کند، می‌توانید آدرس زیر را در مرورگر خود کپی کنید:</p>
+
+            <p class="link-text">
                 {{ protocol }}://{{ domain }}{% url 'accounts:activation_confirm' uidb64=uid token=token %}
             </p>
 
             <div class="divider"></div>
 
             <p>اگر شما این درخواست را انجام نداده‌اید، لطفاً این ایمیل را نادیده بگیرید.</p>
+
+            <p>با تشکر،<br>تیم پشتیبانی {{ site_name }}</p>
         </div>
 
         <div class="email-footer">
-            <p>با تشکر از شما برای انتخاب {{ site_name }}</p>
-            <p>© {% now "Y" %} {{ site_name }}. تمام حقوق محفوظ است.</p>
+            <p>برای هرگونه سوال یا مشکل می‌توانید با پشتیبانی ما تماس بگیرید:</p>
+            <p>تلفن پشتیبانی: ۰۲۱-۱۲۳۴۵۶۷۸</p>
+            <p>ایمیل: support@example.com</p>
+
+            <div class="social-links">
+                <a href="https://instagram.com/example">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" class="social-icon" alt="Instagram">
+                </a>
+                <a href="https://telegram.org/example">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" class="social-icon" alt="Telegram">
+                </a>
+                <a href="https://twitter.com/example">
+                    <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" class="social-icon" alt="Twitter">
+                </a>
+            </div>
+
+            <p style="margin-top: 20px;">© {% now "Y" %} {{ site_name }}. تمام حقوق محفوظ است.</p>
         </div>
     </div>
 </body>

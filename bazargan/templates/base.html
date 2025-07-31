@@ -33,6 +33,24 @@
     font-family: Vazir, sans-serif;
   }
 </style>
+<style>
+  .otp-input {
+    width: 40px;
+    height: 48px;
+    font-size: 22px;         /* کوچکتر از مقدار قبلی */
+    text-align: center;
+    line-height: 48px;       /* هم‌اندازه ارتفاع */
+    padding: 0;
+    border-radius: 8px;
+    font-family: inherit;
+  }
+
+  .otp-input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.25);
+  }
+</style>
+
 </head>
 
 <body>
@@ -115,7 +133,7 @@
                             </div>
 
                             {% else %}
-                            <a class="btn btn-primary btn-transition" href="{% url 'accounts:login' %}">ورود</a>
+                            <a class="btn btn-primary btn-transition" href="{% url 'accounts:login' %}">ورود / ثبت نام</a>
                             {% endif %}
                         </li>
                     </ul>
@@ -448,6 +466,124 @@
 
     </div>
   </div>
+  <!-- Login Email Modal -->
+<div class="modal fade" id="loginEmailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">ورود / ثبت‌نام</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="emailForm">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="loginEmail" class="form-label">ایمیل خود را وارد کنید</label>
+            <input type="email" class="form-control" id="loginEmail" name="email" required>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">ادامه</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Login Password Modal -->
+<div class="modal fade" id="loginPasswordModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">ورود با رمز عبور</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="passwordForm">
+          <input type="hidden" id="passwordEmail" name="email">
+          <div class="mb-3">
+            <label for="password" class="form-label">رمز عبور</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">ورود</button>
+          </div>
+        </form>
+        <div class="text-center mt-3">
+          <a href="#" id="forgotPasswordLink">رمز عبور خود را فراموش کرده‌اید؟</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">بازیابی رمز عبور</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="resetPasswordStep1">
+          <p>لطفاً ایمیل خود را وارد کنید تا کد تأیید برای شما ارسال شود.</p>
+          <form id="resetPasswordForm">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="resetEmail" class="form-label">ایمیل</label>
+              <input type="email" class="form-control" id="resetEmail" name="email" required>
+            </div>
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">ارسال کد تأیید</button>
+            </div>
+          </form>
+        </div>
+
+<div id="resetPasswordStep2" style="display: none;">
+  <p class="text-center">کد تأیید به ایمیل <span id="resetEmailDisplay" class="fw-bold"></span> ارسال شد.</p>
+
+  <form id="otpForm" method="post" action="" class="text-center">
+    {% csrf_token %}
+    <input type="hidden" id="otpEmail" name="email">
+
+    <!-- OTP boxes -->
+<!-- OTP Input Fields -->
+<div class="d-flex justify-content-center gap-2 mb-3" dir="ltr">
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp1" required autofocus>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp2" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp3" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp4" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp5" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp6" required>
+</div>
+
+
+
+    <!-- Confirm button -->
+    <div class="d-grid gap-2 mb-2">
+      <button type="submit" class="btn btn-primary">تأیید</button>
+    </div>
+  </form>
+
+  <!-- Resend Code and Timer -->
+<div class="text-center mb-3">
+  <span id="otpTimer" style="color: #0d6efd;"></span>
+</div>
+
+
+  <!-- Alternate Options -->
+  <div class="text-center mt-3" style="font-size: 1.1rem;">
+    <a href="#" class="fw-bold text-decoration-none">تغییر شماره همراه</a>
+    <span class="mx-2">یا</span>
+    <a href="#" class="fw-bold text-decoration-none">ثبت‌نام با ایمیل</a>
+  </div>
+</div>
+
+      </div>
+    </div>
+  </div>
+</div>
   <!-- ========== END SECONDARY CONTENTS ========== -->
   <script src="{% static 'js/jquery.min.js' %}"></script>
 
@@ -459,6 +595,277 @@
 
       <script src="{% static 'vendor/toastify/toastify.js' %}"></script>
 
+<script>
+  // فوکوس و حرکت بین فیلدهای OTP
+  const otpInputs = document.querySelectorAll('.otp-input');
+
+  otpInputs.forEach((input, index) => {
+    input.addEventListener("input", function () {
+      this.value = this.value.replace(/[^0-9]/g, '');
+      if (this.value && index < otpInputs.length - 1) {
+        otpInputs[index + 1].focus();
+      }
+    });
+
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Backspace" && !this.value && index > 0) {
+        otpInputs[index - 1].focus();
+      }
+    });
+  });
+
+  // وقتی مرحله دوم نمایش داده می‌شود، فوکوس کن روی اولین فیلد
+  function showStep2AndFocusOtp() {
+    document.getElementById("resetPasswordStep1").style.display = "none";
+    document.getElementById("resetPasswordStep2").style.display = "block";
+
+    setTimeout(() => {
+      otpInputs[0].focus();
+    }, 200); // زمان مناسب برای اینکه مودال باز بشه (در موبایل هم جواب میده)
+  }
+
+  // همچنین اگه از Bootstrap modal استفاده می‌کنی:
+  const modal = document.getElementById('resetPasswordModal');
+  modal.addEventListener('shown.bs.modal', function () {
+    const otpVisible = document.getElementById("resetPasswordStep2").style.display !== "none";
+    if (otpVisible) {
+      setTimeout(() => {
+        otpInputs[0].focus();
+      }, 200);
+    }
+  });
+</script>
+
+<script>
+$(document).ready(function() {
+  // نمایش مدال ایمیل هنگام کلیک روی دکمه ورود
+  $('a[href="{% url 'accounts:login' %}"]').on('click', function(e) {
+    e.preventDefault();
+    $('#loginEmailModal').modal('show');
+  });
+
+  // مدیریت فرم ایمیل
+  $('#emailForm').on('submit', function(e) {
+    e.preventDefault();
+    const email = $('#loginEmail').val();
+
+    $.ajax({
+      url: `{% url 'accounts:check_active_user' %}`,
+      method: 'POST',
+      data: {
+        email: email,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(response) {
+        if (response.data.action == 'get-password') {
+
+          $('#loginEmailModal').modal('hide');
+          $('#passwordEmail').val(email);
+          $('#loginPasswordModal').modal('show');
+        } else {
+        console.log(response)
+          $('#loginEmailModal').modal('hide');
+          $('#passwordEmail').val(email);
+          $('#loginPasswordModal').modal('show');
+        }
+      },
+      error: function(xhr, status, error) {
+        Toastify({
+          text: "خطا در ارتباط با سرور",
+          className: "error",
+          style: { background: "red" }
+        }).showToast();
+      }
+    });
+  });
+
+  // مدیریت فرم پسورد
+  $('#passwordForm').on('submit', function(e) {
+    e.preventDefault();
+    const email = $('#passwordEmail').val();
+    const password = $('#password').val()
+
+    $.ajax({
+      url: `{% url 'accounts:login' %}`,
+      method: 'POST',
+      data: {
+        username: email,
+        password: password,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(response) {
+        sessionStorage.setItem("loginSuccess", "true");
+        window.location.href='/'
+      },
+      error: function(xhr, status, error) {
+         Toastify({
+          text: "نام کاربری یا رمز عبور اشتباه است.",
+          className: "error",
+          style: { background: "red" }
+        }).showToast();
+      }
+    });
+  });
+  // لینک فراموشی رمز عبور
+  $('#forgotPasswordLink').on('click', function(e) {
+    e.preventDefault();
+    const email = $('#passwordEmail').val();
+    $('#resetEmail').val(email);
+    $('#loginPasswordModal').modal('hide');
+    $('#resetPasswordModal').modal('show');
+  });
+let timer = 120;
+let interval;
+
+function startTimer() {
+  clearInterval(interval);
+  timer = 10;
+
+  // نمایش متن اولیه تایمر
+  $('#otpTimer')
+    .text(`${timer} ثانیه تا امکان ارسال مجدد کد`)
+    .css('text-decoration', 'none')
+    .css('cursor', 'default')
+    .off('click'); // اطمینان از غیرفعال بودن کلیک
+
+  interval = setInterval(() => {
+    timer--;
+    $('#otpTimer').text(`${timer} ثانیه تا امکان ارسال مجدد کد`);
+
+    if (timer <= 0) {
+      clearInterval(interval);
+
+      // تبدیل به لینک قابل کلیک
+      $('#otpTimer')
+        .text('ارسال مجدد کد')
+        .css('text-decoration', 'underline')
+        .css('cursor', 'pointer')
+        .off('click') // اطمینان از حذف کلیک‌های قبلی
+        .on('click', resendOtp);
+    }
+  }, 1000);
+}
+
+function resendOtp() {
+  const email = $('#otpEmail').val();
+
+  $.ajax({
+    url: `{% url 'accounts:password_reset' %}`,
+    method: 'POST',
+    data: {
+      email: email,
+      csrfmiddlewaretoken: '{{ csrf_token }}'
+    },
+    success: function(response) {
+      Toastify({
+        text: "کد تأیید جدید به ایمیل شما ارسال شد",
+        className: "success",
+        style: { background: "green" }
+      }).showToast();
+    },
+    error: function(xhr, status, error) {
+      Toastify({
+        text: xhr.responseJSON?.message || "خطا در ارسال کد تأیید",
+        className: "error",
+        style: { background: "red" }
+      }).showToast();
+    }
+  });
+
+  // بازگشت به حالت تایمر
+  startTimer();
+}
+
+  // مدیریت فرم بازیابی رمز عبور (مرحله 1)
+ $('#resetPasswordForm').on('submit', function(e) {
+  e.preventDefault();
+  const email = $('#resetEmail').val();
+
+  $.ajax({
+    url: `{% url 'accounts:password_reset' %}`,
+    method: 'POST',
+    data: {
+      email: email,
+      csrfmiddlewaretoken: '{{ csrf_token }}'
+    },
+    success: function(response) {
+      $('#otpEmail').val(email);
+      $('#resetEmailDisplay').text(email);
+      $('#resetPasswordStep1').hide();
+      $('#resetPasswordStep2').show();
+
+      // ✅ شروع تایمر از اینجا
+      startTimer();
+
+      // ✅ فوکوس روی فیلد اول OTP
+      $('.otp-input').first().focus();
+
+      Toastify({
+        text: "کد تأیید به ایمیل شما ارسال شد",
+        className: "success",
+        style: { background: "green" }
+      }).showToast();
+    },
+    error: function(xhr, status, error) {
+      Toastify({
+        text: xhr.responseJSON?.message || "خطا در ارسال کد تأیید",
+        className: "error",
+        style: { background: "red" }
+      }).showToast();
+    }
+  });
+});
+
+  // مدیریت فرم OTP
+  $('#otpForm').on('submit', function(e) {
+    e.preventDefault();
+    const formData = $(this).serialize();
+
+    $.ajax({
+      url: $(this).attr('action'),
+      method: 'POST',
+      data: formData,
+      success: function(response) {
+        if (response.success) {
+          Toastify({
+            text: "رمز عبور با موفقیت تغییر یافت",
+            className: "success",
+            style: { background: "green" }
+          }).showToast();
+
+          setTimeout(function() {
+            $('#resetPasswordModal').modal('hide');
+            window.location.reload();
+          }, 1500);
+        }
+      },
+      error: function(xhr, status, error) {
+        Toastify({
+          text: xhr.responseJSON?.message || "خطا در تغییر رمز عبور",
+          className: "error",
+          style: { background: "red" }
+        }).showToast();
+      }
+    });
+  });
+});
+</script>
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (sessionStorage.getItem("loginSuccess") === "true") {
+    Toastify({
+      text: "با موفقیت وارد شدید!",
+      duration: 3000,
+      gravity: "top", // یا bottom
+      position: "right", // یا left
+      backgroundColor: "#4CAF50", // رنگ سبز موفقیت
+      close: true,
+    }).showToast();
+
+    sessionStorage.removeItem("loginSuccess");
+  }
+});
+</script>
   <!-- JS Plugins Init. -->
   <script>
     (function () {
