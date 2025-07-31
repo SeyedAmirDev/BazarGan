@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'common.middleware.AjaxExceptionMiddleware'
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -150,5 +151,4 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 
 PASSWORD_RESET_TIMEOUT=600
-
-ACCOUNT_EMAIL_VERIFICATION = 'optional'
+ACTIVATION_ACCOUNT_TIMEOUT=24 * 60 * 60
