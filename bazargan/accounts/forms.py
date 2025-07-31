@@ -10,6 +10,47 @@ from django import forms
 User = get_user_model()
 
 
+class CheckActiveUserForm(forms.Form):
+    email = forms.EmailField(
+        label=_("Email"),
+        max_length=254,
+    )
+
+    def save(self):
+        """
+        Make sure the user already exists.
+        If not, create a new user.
+        """
+        email = self.cleaned_data.get("email")
+        user, created = User.objects.get_or_create(email=email)
+        return user
+
+class PasswordResetForm(forms.Form):
+    """
+    Form for requesting a password reset by entering an email.
+    Validates that the provided email belongs to a registered user.
+    """
+    email = forms.EmailField(
+        label=_("Email"),
+        max_length=254,
+        widget=forms.EmailInput(attrs={"autocomplete": "email"}),
+    )
+
+    def clean_email(self):
+        """
+        Make sure the email belongs to a user.
+        If not, raise an error.
+        """
+        email = self.cleaned_data.get("email")
+
+        try:
+            self.user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise ValidationError('user with provided email does not exist.')
+
+        return email
+
+
 class AuthenticationForm(auth_forms.AuthenticationForm):
     def confirm_login_allowed(self, user):
         """
