@@ -1,0 +1,71 @@
+import random
+
+from faker import Faker
+from pathlib import Path
+
+from django.core.management.base import BaseCommand
+from django.utils.text import slugify
+from django.core.files import File
+from django.db.models import Q
+
+from accounts.models import UserType, User
+
+from ...models import Product, ProductCategory, ProductStatusType
+
+
+BASE_DIR = Path(__file__).resolve().parent
+
+
+class Command(BaseCommand):
+    help = 'Generate fake products'
+
+    def handle(self, *args, **options):
+        fake = Faker(locale="fa_IR")
+        user = User.objects.filter(
+            Q(type=UserType.admin.value) | Q(is_superuser=True)
+        ).first()
+        # List of images
+        image_list = [
+            "./images/default.jpg",
+            "./images/img2.jpg",
+            "./images/img3.jpg",
+            "./images/img4.jpg",
+            "./images/img5.jpg",
+            "./images/img6.jpg",
+            "./images/img7.jpg",
+            "./images/img8.jpg",
+            # Add more image filenames as needed
+        ]
+
+        categories = ProductCategory.objects.all()
+
+        for _ in range(10):  # Generate 10 fake products
+            user = user
+            num_categories = random.randint(1, 4)
+            selected_categories = random.sample(list(categories), num_categories)
+            title = ' '.join([fake.word() for _ in range(1,3)])
+            slug = slugify(title,allow_unicode=True)
+            selected_image = random.choice(image_list)
+            image_obj = File(file=open(BASE_DIR / selected_image,"rb"),name=Path(selected_image).name)
+            description = fake.paragraph(nb_sentences=10)
+            brief_description= fake.paragraph(nb_sentences=1)
+            stock = fake.random_int(min=0, max=10)
+            status = random.choice(ProductStatusType.choices)[0]  # Replace with your actual status choices
+            price = fake.random_int(min=10000, max=100000)
+            discount_percent = fake.random_int(min=0, max=50)
+
+            product = Product.objects.create(
+                user=user,
+                title=title,
+                slug=slug,
+                image=image_obj,
+                description=description,
+                brief_description=brief_description,
+                stock=stock,
+                status=status,
+                price=price,
+                discount_percent=discount_percent,
+            )
+            product.category.set(selected_categories)
+
+        self.stdout.write(self.style.SUCCESS('Successfully generated 10 fake products'))
