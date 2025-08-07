@@ -1,0 +1,1322 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+
+<head>
+  <!-- Required Meta Tags Always Come First -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Title -->
+  <title>{% block title %} {% endblock title %}</title>
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font -->
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet">
+
+  <!-- CSS Implementing Plugins -->
+  <link rel="stylesheet" href="{% static '/css/vendor.min.css'%}">
+  <link rel="stylesheet" href="{% static '/vendor/bootstrap-icons/font/bootstrap-icons.css'%}">
+
+  <!-- CSS Front Template -->
+  <link rel="stylesheet" href="{% static '/css/theme.min.css'%}">
+  <link rel="stylesheet" href="{% static 'vendor/toastify/toastify.css' %}">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  {% block extra_css %} {% endblock extra_css %}
+
+  {% block extra_css_no_compress %} {% endblock extra_css_no_compress %}
+  <style>
+  body {
+    font-family: Vazir, sans-serif;
+  }
+</style>
+<style>
+  .otp-input {
+    width: 40px;
+    height: 48px;
+    font-size: 22px;         /* کوچکتر از مقدار قبلی */
+    text-align: center;
+    line-height: 48px;       /* هم‌اندازه ارتفاع */
+    padding: 0;
+    border-radius: 8px;
+    font-family: inherit;
+  }
+
+  .otp-input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.25);
+  }
+</style>
+
+</head>
+
+<body>
+  <header id="header" class="navbar navbar-expand-lg navbar-end navbar-light">
+    <div class="container">
+
+           <nav class="js-mega-menu navbar-nav-wrap">
+                <!-- Default Logo -->
+                <a class="navbar-brand" href="{% url 'website:index' %}" aria-label="Front">
+                    <img class="navbar-brand-logo" src="{% static 'svg/logos/logo.svg' %}" alt="Logo">
+                </a>
+                <!-- End Default Logo -->
+
+                <!-- Toggler -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-default">
+                        <i class="bi-list"></i>
+                    </span>
+                    <span class="navbar-toggler-toggled">
+                        <i class="bi-x"></i>
+                    </span>
+                </button>
+                <!-- End Toggler -->
+
+                <!-- Collapse -->
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link " href="{% url 'website:index' %}">صفحه اصلی</a>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link " href="">لیست محصولات</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.view_name  == 'website:about' %} active {% endif %}" href="{% url 'website:about' %}">درباره ما</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.view_name  == 'website:contact' %} active {% endif %}" href="">ارتباط با ما</a>
+                        </li>
+
+
+
+                        <li class="nav-item">
+                          <!-- Search -->
+                          <button class="btn btn-ghost-secondary btn-icon" type="button" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasNavbarSearch" aria-controls="offcanvasNavbarSearch">
+                            <i class="bi-search"></i>
+                          </button>
+                          <!-- End Search -->
+
+                          <!-- Shopping Cart -->
+<!--                          <button type="button" class="btn btn-ghost-secondary btn-icon" type="button" data-bs-toggle="offcanvas"-->
+<!--                            data-bs-target="#offcanvasNavbarShoppingCart" aria-controls="offcanvasNavbarShoppingCart">-->
+<!--                            <i class="bi-basket"></i>-->
+<!--                            <span class="cart-item-count ">3</span>-->
+<!--                          </button>-->
+
+                          <a href="" type="button" class="btn btn-ghost-secondary btn-icon">
+                            <i class="bi-basket"></i>
+                            <span class="cart-item-count" id="total-cart-item-count"></span>
+                          </a>
+                          <!-- End Shopping Cart -->
+                            {% if request.user.is_authenticated %}
+
+                            <button class="btn btn-ghost-secondary btn-icon" id="dropdownMenuLink"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="avatar avatar-sm avatar-circle">
+                                    <img class="avatar-img" src="{{request.user.profile.image.url}}"
+                                        alt="Image Description">
+                                </span>
+                            </button>
+
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="">پروفایل</a>
+                                <a class="dropdown-item" href="{% url 'accounts:logout' %}">خروج</a>
+                            </div>
+
+                            {% else %}
+                            <a class="btn btn-primary btn-transition" href="{% url 'accounts:login' %}">ورود / ثبت نام</a>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+                <!-- End Collapse -->
+            </nav>
+    </div>
+  </header>
+
+  <!-- ========== END HEADER ========== -->
+  <!-- ========== HEADER ========== -->
+<div id="promoAlertCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+  <div class="carousel-inner text-center alert alert-primary rounded-0 mb-0 no-select" role="alert">
+    <div class="carousel-item active">
+      🎉 تخفیف تابستانی تا ۳۰٪ فقط تا پایان هفته!
+      <a href="/products?offer=true" class="text-white fw-bold">همین حالا خرید کن</a>
+    </div>
+    <div class="carousel-item">
+      🚚 ارسال رایگان برای سفارش‌های بالای 500 هزار تومان!
+      <a href="/shipping" class="text-white fw-bold">اطلاعات بیشتر</a>
+    </div>
+    <div class="carousel-item">
+      🆕 محصولات جدید اضافه شد!
+      <a href="/products/new" class="text-white fw-bold">مشاهده</a>
+    </div>
+  </div>
+  <!-- ========== MAIN CONTENT ========== -->
+  <main id="content" role="main">
+  {% block content %}{% endblock content %}
+  </main>
+  <!-- ========== END MAIN CONTENT ========== -->
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="border-top">
+    <div class="container">
+      <div class="row justify-content-lg-between content-space-t-2 content-space-b-lg-2">
+        <div class="col-lg-3 mb-5">
+          <div class="d-flex align-items-start flex-column h-100">
+            <!-- Logo -->
+            <a class="w-100 mb-3 mb-lg-auto" href="{% url 'website:index'%}" aria-label="Front">
+              <img class="brand" src="{% static '/svg/logos/logo.svg'%}" alt="Logo">
+            </a>
+            <!-- End Logo -->
+
+            <p class="text-muted small mb-0">© 2025 Bazargan</p>
+          </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-3 ms-lg-auto mb-5 mb-lg-0">
+          <h5>حساب</h5>
+
+          <!-- List -->
+          <ul class="list-unstyled list-py-1">
+            <li><a class="link-sm text-secondary" href="#">سفارش دادن</a></li>
+            <li><a class="link-sm text-secondary" href="#">گزینه های حمل و نقل</a></li>
+            <li><a class="link-sm text-secondary" href="#">پیگیری یک بسته</a></li>
+            <li><a class="link-sm text-secondary" href="#">در دسترس بودن کشور</a></li>
+          </ul>
+          <!-- End List -->
+        </div>
+        <!-- End Col -->
+
+        <div class="col-6 col-md-4 col-lg-3 mb-5 mb-lg-0">
+          <h5>شرکت</h5>
+
+          <!-- List -->
+          <ul class="list-unstyled list-py-1">
+            <li><a class="link-sm text-secondary" href="#">تامین مالی</a></li>
+            <li><a class="link-sm text-secondary" href="#">بازیافت</a></li>
+            <li><a class="link-sm text-secondary" href="#">سیاست بازگشت</a></li>
+          </ul>
+          <!-- End List -->
+        </div>
+        <!-- End Col -->
+
+        <div class="col-md-4 col-lg-2 mb-5 mb-lg-0">
+          <h5 class="mb-3">منابع</h5>
+
+          <!-- List -->
+          <ul class="list-unstyled list-py-1">
+            <li><a class="link-sm link-secondary" href="#"><i class="bi-question-circle-fill me-1"></i> کمک</a></li>
+            <li><a class="link-sm link-secondary" href="#"><i class="bi-person-circle me-1"></i> حساب شما</a></li>
+          </ul>
+          <!-- End List -->
+
+          <!-- Button Group -->
+          <div class="btn-group">
+            <button type="button" class="btn btn-white btn-sm dropdown-toggle" id="footerSelectLanguage"
+              data-bs-toggle="dropdown" aria-expanded="false" data-bs-dropdown-animation>
+              <span class="d-flex align-items-center">
+                <img class="avatar avatar-xss avatar-circle ms-2" src="{% static '/vendor/flag-icon-css/flags/1x1/us.svg'%}"
+                  alt="Image description" width="16" />
+                <span>انگلیسی (US)</span>
+              </span>
+            </button>
+
+            <div class="dropdown-menu" aria-labelledby="footerSelectLanguage">
+              <a class="dropdown-item d-flex align-items-center active" href="#">
+                <img class="avatar avatar-xss avatar-circle ms-2" src="{% static '/vendor/flag-icon-css/flags/1x1/us.svg'%}"
+                  alt="Image description" width="16" />
+                <span>انگلیسی</span>
+              </a>
+              <a class="dropdown-item d-flex align-items-center" href="#">
+                <img class="avatar avatar-xss avatar-circle ms-2" src="{% static '/vendor/flag-icon-css/flags/1x1/de.svg'%}"
+                  alt="Image description" width="16" />
+                <span>آلمانی</span>
+              </a>
+              <a class="dropdown-item d-flex align-items-center" href="#">
+                <img class="avatar avatar-xss avatar-circle ms-2" src="{% static '/vendor/flag-icon-css/flags/1x1/es.svg'%}"
+                  alt="Image description" width="16" />
+                <span>اسپانیایی</span>
+              </a>
+              <a class="dropdown-item d-flex align-items-center" href="#">
+                <img class="avatar avatar-xss avatar-circle ms-2" src="{% static '/vendor/flag-icon-css/flags/1x1/cn.svg'%}"
+                  alt="Image description" width="16" />
+                <span>چینی</span>
+              </a>
+            </div>
+          </div>
+          <!-- End Button Group -->
+        </div>
+        <!-- End Col -->
+      </div>
+      <!-- End Row -->
+
+      <hr class="my-0">
+
+      <div class="row align-items-sm-center content-space-1">
+        <div class="col-sm mb-4 mb-sm-0">
+          <!-- Socials -->
+          <ul class="list-inline mb-0">
+            <li class="list-inline-item">
+              <a class="btn btn-soft-secondary btn-xs btn-icon" href="#">
+                <i class="bi-facebook"></i>
+              </a>
+            </li>
+
+            <li class="list-inline-item">
+              <a class="btn btn-soft-secondary btn-xs btn-icon" href="#">
+                <i class="bi-google"></i>
+              </a>
+            </li>
+
+            <li class="list-inline-item">
+              <a class="btn btn-soft-secondary btn-xs btn-icon" href="#">
+                <i class="bi-twitter"></i>
+              </a>
+            </li>
+
+            <li class="list-inline-item">
+              <a class="btn btn-soft-secondary btn-xs btn-icon" href="#">
+                <i class="bi-github"></i>
+              </a>
+            </li>
+          </ul>
+          <!-- End Socials -->
+        </div>
+
+        <div class="col-sm-auto">
+          <!-- List -->
+          <ul class="list-inline list-separator">
+            <li class="list-inline-item">
+              <a class="link-sm link-secondary" href="/page-privacy.html">حریم خصوصی و خط مشی</a>
+            </li>
+            <li class="list-inline-item">
+              <a class="link-sm link-secondary" href="/page-terms.html">مقررات و شرایط</a>
+            </li>
+            <li class="list-inline-item">
+              <a class="link-sm link-secondary" href="/#">مشاغل</a>
+            </li>
+          </ul>
+          <!-- End List -->
+        </div>
+      </div>
+    </div>
+  </footer>
+  <!-- ========== END FOOTER ========== -->
+
+  <!-- ========== SECONDARY CONTENTS ========== -->
+  <!-- Sign Up -->
+
+  <!-- Go To -->
+  <a class="js-go-to go-to position-fixed" href="javascript:;" style="visibility: hidden;" data-hs-go-to-options='{
+       "offsetTop": 700,
+       "position": {
+         "init": {
+           "right": "2rem"
+         },
+         "show": {
+           "bottom": "2rem"
+         },
+         "hide": {
+           "bottom": "-2rem"
+         }
+       }
+     }'>
+    <i class="bi-chevron-up"></i>
+  </a>
+
+  <!-- Offcanvas Search -->
+  <div class="offcanvas offcanvas-top offcanvas-navbar-search bg-light" tabindex="-1" id="offcanvasNavbarSearch">
+    <div class="offcanvas-body">
+      <div class="container">
+        <div class="w-lg-75 mx-lg-auto">
+          <div class="d-flex justify-content-end mb-3">
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+
+          <div class="mb-7">
+            <!-- Form -->
+            <form action="">
+              <!-- Input Card -->
+              <div class="input-card">
+                <div class="input-card-form">
+                  <input type="text" class="form-control form-control-lg" placeholder="جستجو محصولات"
+                    aria-label="جستجو محصولات" name="q">
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg">جستجو کردن</button>
+              </div>
+              <!-- End Input Card -->
+            </form>
+            <!-- End Form -->
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offcanvas Search -->
+  <div class="offcanvas offcanvas-end " tabindex="-1" id="offcanvasNavbarShoppingCart">
+    <div class="offcanvas-header justify-content-between border-0 pb-0 ">
+      <span> 3 کالا</span>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+
+    <div class="offcanvas-body">
+
+      <div class="">
+        <!-- Product -->
+        <div class="border-bottom  mb-4">
+          <div class="d-flex">
+            <div class="flex-shrink-0">
+              <div class="avatar avatar-lg ms-3">
+                <img class="avatar-img" src="{% static '/img/320x320/img2.jpg'%}" alt="Image Description">
+              </div>
+            </div>
+
+            <div class="flex-grow-1">
+              <a class="h5" href="./product-overview.html">کوله پشتی ملی اصل</a>
+
+              <div class="d-grid py-3">
+                <div class="text-body py-1">
+                  <div class="d-flex justify-content-start align-items-center">
+                    <span class="h6">تعداد:</span>
+                    <div class="quantity">
+                      <div class="input-group input-group-sm quantity-selector px-5">
+                        <button type="button" class="btn btn-sm btn-icon btn-outline-primary">
+                          <i class="bi-plus"></i>
+                        </button>
+                        <input type="number" class="form-control" value="2" min="1" max="10">
+                        <button type="button" class="btn btn-sm btn-icon btn-outline-danger">
+                          <i class="bi-dash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <div class="text-body py-1">
+                  <div class="d-flex justify-content-start  align-items-center">
+                    <span class="h6">قیمت:</span>
+                    <span class="px-5">150000 تومان</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Product -->
+        <!-- Product -->
+        <div class="border-bottom  mb-4">
+          <div class="d-flex">
+            <div class="flex-shrink-0">
+              <div class="avatar avatar-lg ms-3">
+                <img class="avatar-img" src="{% static '/img/320x320/img3.jpg'%}" alt="Image Description">
+              </div>
+            </div>
+
+            <div class="flex-grow-1">
+              <a class="h5" href="./product-overview.html">تیشرت مشکی</a>
+
+              <div class="d-grid py-3">
+                <div class="text-body py-1">
+                  <div class="d-flex justify-content-start align-items-center">
+                    <span class="h6">تعداد:</span>
+                    <div class="quantity">
+                      <div class="input-group input-group-sm quantity-selector px-5">
+                        <button type="button" class="btn btn-sm btn-icon btn-outline-primary">
+                          <i class="bi-plus"></i>
+                        </button>
+                        <input type="number" class="form-control" value="1" min="1" max="10">
+                        <button type="button" class="btn btn-sm btn-icon btn-outline-danger">
+                          <i class="bi-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <div class="text-body py-1">
+                  <div class="d-flex justify-content-start  align-items-center">
+                    <span class="h6">قیمت:</span>
+                    <span class="px-5">100000 تومان</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Product -->
+
+      </div>
+
+      <div class="d-grid">
+        <p class="text-center">قیمت نهایی: 35000 تومان</p>
+        <a class="btn btn-primary btn-lg" href="/cart.html">سبد خرید</a>
+      </div>
+
+    </div>
+  </div>
+  <!-- Login Email Modal -->
+<div class="modal fade" id="loginEmailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">ورود / ثبت‌نام</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="emailForm">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="loginEmail" class="form-label">ایمیل خود را وارد کنید</label>
+            <input type="email" class="form-control" id="loginEmail" name="email" required>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">ادامه</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Login Password Modal -->
+<div class="modal fade" id="loginPasswordModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">ورود با رمز عبور</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="passwordForm">
+          <input type="hidden" id="passwordEmail" name="email">
+          <div class="mb-3">
+            <label for="password" class="form-label">رمز عبور</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">ورود</button>
+          </div>
+        </form>
+        <div class="text-center mt-3">
+          <a href="#" id="forgotPasswordLink">رمز عبور خود را فراموش کرده‌اید؟</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">بازیابی رمز عبور</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="resetPasswordStep1">
+          <p>لطفاً ایمیل خود را وارد کنید تا کد تأیید برای شما ارسال شود.</p>
+          <form id="resetPasswordForm">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="resetEmail" class="form-label">ایمیل</label>
+              <input type="email" class="form-control" id="resetEmail" name="email" required>
+            </div>
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">ارسال کد تأیید</button>
+            </div>
+          </form>
+        </div>
+
+<div id="resetPasswordStep2" style="display: none;">
+  <p class="text-center">کد تأیید به ایمیل <span id="resetEmailDisplay" class="fw-bold"></span> ارسال شد.</p>
+
+  <form id="otpForm" method="post" action="" class="text-center">
+    {% csrf_token %}
+    <input type="hidden" id="otpEmail" name="email">
+
+    <!-- OTP boxes -->
+<!-- OTP Input Fields -->
+<div class="d-flex justify-content-center gap-2 mb-3" dir="ltr">
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp1" required autofocus>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp2" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp3" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp4" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp5" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp6" required>
+</div>
+
+
+
+    <!-- Confirm button -->
+    <div class="d-grid gap-2 mb-2">
+      <button type="submit" class="btn btn-primary">تأیید</button>
+    </div>
+  </form>
+
+  <!-- Resend Code and Timer -->
+<div class="text-center mb-3">
+  <span id="otpTimer" style="color: #0d6efd;"></span>
+</div>
+
+
+
+
+  <!-- Alternate Options -->
+  <div class="text-center mt-3" style="font-size: 1.1rem;">
+    <a href="#" class="fw-bold text-decoration-none">تغییر شماره همراه</a>
+    <span class="mx-2">یا</span>
+    <a href="#" class="fw-bold text-decoration-none">ثبت‌نام با ایمیل</a>
+  </div>
+</div>
+                <!-- مرحله 3: تنظیم رمز عبور جدید -->
+        <div id="resetPasswordStep3" style="display: none;">
+          <p class="text-center">لطفاً رمز عبور جدید خود را وارد کنید</p>
+          <form id="newPasswordForm">
+            {% csrf_token %}
+            <input type="hidden" id="verificationCode" name="code">
+            <input type="hidden" id="verificationEmail" name="email">
+
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">رمز عبور جدید</label>
+              <input type="password" class="form-control" id="newPassword" name="password1" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label">تکرار رمز عبور جدید</label>
+              <input type="password" class="form-control" id="confirmPassword" name="password2" required>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">تغییر رمز عبور</button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- New User Verification Modal -->
+<div class="modal fade" id="newUserModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">تایید کاربر جدید</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Step 1: OTP Verification -->
+        <div id="verificationStep1">
+          <p class="text-center">کد تأیید به ایمیل <span id="userEmailDisplay" class="fw-bold"></span> ارسال شد.</p>
+
+          <form id="AccountOtpForm" class="text-center">
+            {% csrf_token %}
+            <input type="hidden" id="userEmail" name="email">
+
+            <!-- OTP Input Fields -->
+<div class="d-flex justify-content-center gap-2 mb-3" dir="ltr">
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp1" required autofocus>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp2" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp3" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp4" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp5" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp6" required>
+</div>
+
+            <!-- Confirm button -->
+            <div class="d-grid gap-2 mb-2">
+              <button type="submit" class="btn btn-primary">تأیید</button>
+            </div>
+          </form>
+
+          <!-- Resend Code and Timer -->
+          <div class="text-center mb-3">
+            <span id="ActivationOtpTimer" style="color: #0d6efd;"></span>
+          </div>
+
+          <!-- Alternate Options -->
+          <div class="text-center mt-3" style="font-size: 1.1rem;">
+            <a href="#" class="fw-bold text-decoration-none">تغییر ایمیل</a>
+            <span class="mx-2">یا</span>
+            <a href="#" class="fw-bold text-decoration-none">ورود به حساب کاربری</a>
+          </div>
+        </div>
+
+        <!-- Step 2: Set Password -->
+        <div id="verificationStep2" style="display: none;">
+          <p class="text-center">لطفاً رمز عبور خود را تنظیم کنید</p>
+          <form id="setPasswordForm">
+            {% csrf_token %}
+            <input type="hidden" id="AccountVerificationCode" name="code">
+            <input type="hidden" id="AccountVerificationEmail" name="email">
+
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">رمز عبور</label>
+              <input type="password" class="form-control" id="AccountPassword" name="password1" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label">تکرار رمز عبور</label>
+              <input type="password" class="form-control" id="AccountconfirmPassword" name="password2" required>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">ثبت نام</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- ========== END SECONDARY CONTENTS ========== -->
+  <script src="{% static 'js/jquery.min.js' %}"></script>
+
+  <!-- JS Implementing Plugins -->
+  <script src="{% static '/js/vendor.min.js'%}"></script>
+
+  <!-- JS Front -->
+  <script src="{% static '/js/theme.min.js'%}"></script>
+
+      <script src="{% static 'vendor/toastify/toastify.js' %}"></script>
+
+<script>
+  // فوکوس و حرکت بین فیلدهای OTP
+  const otpInputs = document.querySelectorAll('.otp-input');
+
+  otpInputs.forEach((input, index) => {
+    input.addEventListener("input", function () {
+      this.value = this.value.replace(/[^0-9]/g, '');
+      if (this.value && index < otpInputs.length - 1) {
+        otpInputs[index + 1].focus();
+      }
+    });
+
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Backspace" && !this.value && index > 0) {
+        otpInputs[index - 1].focus();
+      }
+    });
+  });
+
+  // وقتی مرحله دوم نمایش داده می‌شود، فوکوس کن روی اولین فیلد
+  function showStep2AndFocusOtp() {
+    document.getElementById("resetPasswordStep1").style.display = "none";
+    document.getElementById("resetPasswordStep2").style.display = "block";
+
+    setTimeout(() => {
+      otpInputs[0].focus();
+    }, 200); // زمان مناسب برای اینکه مودال باز بشه (در موبایل هم جواب میده)
+  }
+
+  // همچنین اگه از Bootstrap modal استفاده می‌کنی:
+  const modal = document.getElementById('resetPasswordModal');
+  modal.addEventListener('shown.bs.modal', function () {
+    const otpVisible = document.getElementById("resetPasswordStep2").style.display !== "none";
+    if (otpVisible) {
+      setTimeout(() => {
+        otpInputs[0].focus();
+      }, 200);
+    }
+  });
+</script>
+
+  <script>
+    /**
+ * Authentication System JavaScript
+ * Handles login, registration, password reset, and OTP verification
+ */
+
+$(document).ready(function() {
+
+  // ======================
+  // LOGIN FLOW
+  // ======================
+
+  // Show email modal when login button is clicked
+  $('a[href="{% url 'accounts:login' %}"]').on('click', function(e) {
+    e.preventDefault();
+    $('#loginEmailModal').modal('show');
+  });
+
+  // Handle email form submission
+  $('#emailForm').on('submit', function(e) {
+    e.preventDefault();
+    const email = $('#loginEmail').val();
+
+    $.ajax({
+      url: `{% url 'accounts:check_active_user' %}`,
+      method: 'POST',
+      data: {
+        email: email,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(response) {
+        $('#loginEmailModal').modal('hide');
+
+        if (response.data.action === 'get-password') {
+          // Existing user - show password modal
+          $('#passwordEmail').val(email);
+          $('#loginPasswordModal').modal('show');
+        } else {
+          // New user - show registration modal
+          $('#userEmail').val(email);
+          $('#userEmailDisplay').text(email);
+          $('#newUserModal').modal('show');
+          startActivationTimer(response.data.timer);
+          console.log(response.data.timer)
+        }
+      },
+      error: function() {
+        showToast("خطا در ارتباط با سرور", "error");
+      }
+    });
+  });
+
+  // Handle password form submission
+  $('#passwordForm').on('submit', function(e) {
+    e.preventDefault();
+    const email = $('#passwordEmail').val();
+    const password = $('#password').val();
+
+    $.ajax({
+      url: `{% url 'accounts:login' %}`,
+      method: 'POST',
+      data: {
+        username: email,
+        password: password,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function() {
+        sessionStorage.setItem("loginSuccess", "true");
+        window.location.href = '/';
+      },
+      error: function() {
+        showToast("نام کاربری یا رمز عبور اشتباه است.", "error");
+      }
+    });
+  });
+
+  // ======================
+  // PASSWORD RESET FLOW
+  // ======================
+
+  // Forgot password link
+  $('#forgotPasswordLink').on('click', function(e) {
+    e.preventDefault();
+    const email = $('#passwordEmail').val();
+    $('#resetEmail').val(email);
+    $('#loginPasswordModal').modal('hide');
+    $('#resetPasswordModal').modal('show');
+  });
+
+  // Password reset form (Step 1: Send OTP)
+  $('#resetPasswordForm').on('submit', function(e) {
+    e.preventDefault();
+    const email = $('#resetEmail').val();
+
+    $.ajax({
+      url: `{% url 'accounts:password_reset_otp' %}`,
+      method: 'POST',
+      data: {
+        email: email,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(response) {
+        $('#otpEmail').val(email);
+        $('#resetEmailDisplay').text(email);
+        $('#resetPasswordStep1').hide();
+        $('#resetPasswordStep2').show();
+
+        startTimer(response.data.timer);
+        $('.otp-input').first().focus();
+        showToast(response.message, "success");
+      },
+      error: function(xhr) {
+        const message = xhr.responseJSON?.message || "خطا در ارسال کد تأیید";
+        showToast(message, "error");
+      }
+    });
+  });
+
+  // OTP verification form (Step 2)
+  $('#otpForm').on('submit', function(e) {
+    e.preventDefault();
+    const otp = collectOtpValues();
+    const email = $('#otpEmail').val();
+
+    $.ajax({
+      url: `{% url 'accounts:password_reset_otp_verify' %}`,
+      method: 'POST',
+      data: {
+        email: email,
+        otp: otp,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(response) {
+        if (response.status === 'success') {
+          $('#verificationEmail').val(email);
+          $('#verificationCode').val(response.data.code);
+          $('#resetPasswordStep2').hide();
+          $('#resetPasswordStep3').show();
+        }
+      },
+      error: function(xhr) {
+        const message = xhr.responseJSON?.message || "کد تأیید نامعتبر است";
+        showToast(message, "error");
+      }
+    });
+  });
+
+  // New password form (Step 3)
+  $('#resetPasswordStep3').on('submit', function(e) {
+    e.preventDefault();
+    const password1 = $('#newPassword').val();
+    const password2 = $('#confirmPassword').val();
+    const email = $('#verificationEmail').val();
+    const code = $('#verificationCode').val();
+
+    $.ajax({
+      url: `{% url 'accounts:password_reset_otp_complete' %}`,
+      method: 'POST',
+      data: {
+        email: email,
+        code: code,
+        password1: password1,
+        password2: password2,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function() {
+        sessionStorage.setItem("loginSuccess", "true");
+        window.location.href = '/';
+      },
+      error: function(xhr) {
+        const message = xhr.responseJSON?.message || "خطا در تغییر رمز عبور";
+        showToast(message, "error");
+      }
+    });
+  });
+
+  // ======================
+  // ACCOUNT ACTIVATION FLOW
+  // ======================
+
+  // Account OTP verification
+  $('#AccountOtpForm').on('submit', function(e) {
+    e.preventDefault();
+    const otp = collectOtpValues();
+    const email = $('#userEmail').val();
+
+    $.ajax({
+      url: `{% url 'accounts:activation_otp_verify' %}`,
+      method: 'POST',
+      data: {
+        email: email,
+        otp: otp,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(response) {
+        if (response.status === 'success') {
+          $('#AccountVerificationEmail').val(email);
+          $('#AccountVerificationCode').val(response.data.code);
+          $('#verificationStep1').hide();
+          $('#verificationStep2').show();
+        }
+      },
+      error: function(xhr) {
+        const message = xhr.responseJSON?.message || "کد تأیید نامعتبر است";
+        showToast(message, "error");
+      }
+    });
+  });
+
+  // Set password form for new accounts
+  $('#setPasswordForm').on('submit', function(e) {
+    e.preventDefault();
+    const password1 = $('#AccountPassword').val();
+    const password2 = $('#AccountconfirmPassword').val();
+    const email = $('#AccountVerificationEmail').val();
+    const code = $('#AccountVerificationCode').val();
+
+    $.ajax({
+      url: `{% url 'accounts:activation_otp_complete' %}`,
+      method: 'POST',
+      data: {
+        email: email,
+        code: code,
+        password1: password1,
+        password2: password2,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function() {
+        sessionStorage.setItem("loginSuccess", "true");
+        window.location.href = '/';
+      },
+      error: function(xhr) {
+        const message = xhr.responseJSON?.message || "خطا در ایجاد حساب کاربری";
+        showToast(message, "error");
+      }
+    });
+  });
+
+});
+
+// ======================
+// TIMER FUNCTIONS
+// ======================
+
+// let timer = 120;
+let interval;
+
+function startTimer(timer) {
+  clearInterval(interval);
+
+  updateTimerDisplay('#otpTimer', false, timer);
+
+  interval = setInterval(() => {
+    timer--;
+    updateTimerDisplay('#otpTimer', timer <= 0, timer);
+
+    if (timer <= 0) {
+      clearInterval(interval);
+      makeTimerClickable('#otpTimer', resendOtp);
+    }
+  }, 1000);
+}
+
+function startActivationTimer(timer) {
+  clearInterval(interval);
+
+  updateTimerDisplay('#ActivationOtpTimer', false, timer);
+
+  interval = setInterval(() => {
+    timer--;
+    updateTimerDisplay('#ActivationOtpTimer', timer <= 0, timer);
+
+    if (timer <= 0) {
+      clearInterval(interval);
+      makeTimerClickable('#ActivationOtpTimer', resendActivationOtp);
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay(selector, isClickable, timerValue) {
+  const $element = $(selector);
+
+  if (isClickable) {
+    $element
+      .text('ارسال مجدد کد')
+      .css({
+        'text-decoration': 'underline',
+        'cursor': 'pointer'
+      });
+  } else {
+    $element
+      .text(`${timerValue} ثانیه تا امکان ارسال مجدد کد`)
+      .css({
+        'text-decoration': 'none',
+        'cursor': 'default'
+      })
+      .off('click');
+  }
+}
+
+
+function makeTimerClickable(selector, clickHandler) {
+  $(selector)
+    .off('click')
+    .on('click', clickHandler);
+}
+
+// ======================
+// RESEND OTP FUNCTIONS
+// ======================
+
+function resendOtp() {
+  const email = $('#otpEmail').val();
+
+  $.ajax({
+    url: `{% url 'accounts:password_reset_otp' %}`,
+    method: 'POST',
+    data: {
+      email: email,
+      csrfmiddlewaretoken: '{{ csrf_token }}'
+    },
+    success: function(response) {
+      showToast(response.message, "success");
+      startTimer(response.data.timer);
+    },
+    error: function(response) {
+      const message = response.message;
+      showToast(message, "error");
+    }
+  });
+}
+
+function resendActivationOtp() {
+  const email = $('#userEmail').val();
+
+  $.ajax({
+    url: `{% url 'accounts:activation_otp' %}`,
+    method: 'POST',
+    data: {
+      email: email,
+      csrfmiddlewaretoken: '{{ csrf_token }}'
+    },
+    success: function(response) {
+      showToast(response.message, "success");
+      startActivationTimer(response.data.timer);
+    },
+    error: function(error) {
+      const message = error.message;
+      showToast(message, "error");
+    }
+  });
+}
+
+// ======================
+// UTILITY FUNCTIONS
+// ======================
+
+function collectOtpValues() {
+  let otp = "";
+  document.querySelectorAll(".otp-input").forEach(input => {
+    otp += input.value;
+  });
+  return otp;
+}
+
+function showToast(message, type) {
+  const backgroundColor = type === "success" ? "#4CAF50" : "#f44336";
+
+  Toastify({
+    text: message,
+    className: type,
+    style: {
+      background: backgroundColor
+    },
+    duration: 3000,
+    gravity: "top",
+    position: "right",
+    close: true
+  }).showToast();
+}
+
+// ======================
+// SUCCESS MESSAGE ON PAGE LOAD
+// ======================
+
+document.addEventListener("DOMContentLoaded", function() {
+  if (sessionStorage.getItem("loginSuccess") === "true") {
+    showToast("با موفقیت وارد شدید!", "success");
+    sessionStorage.removeItem("loginSuccess");
+  }
+});
+  </script>
+  <!-- JS Plugins Init. -->
+  <script>
+    (function () {
+      // INITIALIZATION OF MEGA MENU
+      // =======================================================
+      new HSMegaMenu('.js-mega-menu', {
+        desktop: {
+          position: 'left'
+        }
+      })
+
+
+      // INITIALIZATION OF SHOW ANIMATIONS
+      // =======================================================
+      new HSShowAnimation('.js-animation-link')
+
+
+      // INITIALIZATION OF BOOTSTRAP VALIDATION
+      // =======================================================
+      // HSBsValidation.init('.js-validate', {
+      //   onSubmit: data => {
+      //     data.event.preventDefault()
+      //     alert('Submited')
+      //   }
+      // })
+
+
+      // INITIALIZATION OF BOOTSTRAP DROPDOWN
+      // =======================================================
+      HSBsDropdown.init()
+
+
+      // INITIALIZATION OF GO TO
+      // =======================================================
+      new HSGoTo('.js-go-to')
+
+
+      // INITIALIZATION OF SWIPER
+      // =======================================================
+      var sliderThumbs = new Swiper('.js-swiper-shop-hero-thumbs', {
+        watchSlidesVisibility: true,
+        watchSlidesProgress: true,
+        history: false,
+        slidesPerView: 3,
+        spaceBetween: 15,
+        on: {
+          beforeInit: (swiper) => {
+            const css = `.swiper-slide-thumb-active .swiper-thumb-progress .swiper-thumb-progress-path {
+                  opacity: 1;
+                  -webkit-animation: ${swiper.originalParams.autoplay.delay}ms linear 0ms forwards swiperThumbProgressDash;
+                  animation: ${swiper.originalParams.autoplay.delay}ms linear 0ms forwards swiperThumbProgressDash;
+              }`
+            style = document.createElement('style')
+            document.head.appendChild(style)
+            style.type = 'text/css'
+            style.appendChild(document.createTextNode(css));
+
+            swiper.el.querySelectorAll('.js-swiper-thumb-progress')
+              .forEach(slide => {
+                slide.insertAdjacentHTML('beforeend', '<span class="swiper-thumb-progress"><svg version="1.1" viewBox="0 0 160 160"><path class="swiper-thumb-progress-path" d="M 79.98452083651917 4.000001576345426 A 76 76 0 1 1 79.89443752470656 4.0000733121155605 Z"></path></svg></span>')
+              })
+          },
+        },
+      });
+
+      var swiper = new Swiper('.js-swiper-shop-classic-hero', {
+        autoplay: true,
+        loop: true,
+        navigation: {
+          nextEl: '.js-swiper-shop-classic-hero-button-next',
+          prevEl: '.js-swiper-shop-classic-hero-button-prev',
+        },
+        thumbs: {
+          swiper: sliderThumbs
+        }
+      });
+
+
+      // INITIALIZATION OF COUNTDOWN
+      // =======================================================
+      const oneYearFromNow = new Date()
+
+      document.querySelectorAll('.js-countdown').forEach(item => {
+        const days = item.querySelector('.js-cd-days'),
+          hours = item.querySelector('.js-cd-hours'),
+          minutes = item.querySelector('.js-cd-minutes'),
+          seconds = item.querySelector('.js-cd-seconds')
+
+        countdown(oneYearFromNow.setFullYear(
+          oneYearFromNow.getFullYear() + 1),
+          ts => {
+            days.innerHTML = ts.days
+            hours.innerHTML = ts.hours
+            minutes.innerHTML = ts.minutes
+            seconds.innerHTML = ts.seconds
+          },
+          countdown.DAYS | countdown.HOURS | countdown.MINUTES | countdown.SECONDS
+        )
+      })
+    })()
+
+        var swiper = new Swiper('.js-swiper-shop-product', {
+            effect: 'fade',
+            autoplay: true,
+            loop: true,
+            navigation: {
+                nextEl: '.js-swiper-shop-product-button-next',
+                prevEl: '.js-swiper-shop-product-button-prev',
+            },
+            thumbs: {
+                swiper: sliderThumbs
+            }
+        });
+
+        var sliderThumbs = new Swiper('.js-swiper-shop-product-thumb', {
+            slidesPerView: 3,
+            watchSlidesVisibility: true,
+            watchSlidesProgress: true,
+            history: false,
+        });
+        // INITIALIZATION OF  QUANTITY COUNTER
+        // =======================================================
+        new HSQuantityCounter('.js-quantity-counter')
+  </script>
+   <!-- JS Custom-->
+    <script src="{% static 'js/custom.js' %}"></script>
+    <!-- JS Cart-->
+    <script>
+        function addToCart(product_id) {
+
+            $.ajax({
+                url: "",
+                // url: "",
+                method: 'POST',
+                data: {
+                    product_id: product_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+
+                },
+                success: function (response) {
+                    $("#total-cart-item-count").html(response.total_quantity)
+                    console.log(response);
+                    // do something with the response data
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(errorThrown);
+                    // handle the error case
+                }
+            });
+        }
+        function addToWishlist(element,product_id) {
+
+            //console.log(product_id)
+            $.ajax({
+                url: "",
+                method: 'POST',
+                data: {
+                    product_id: product_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+
+                },
+                success: function (response) {
+
+                    Toastify({
+                        text:response.message,
+                        className: `info`,
+                        style: {
+                          background: "blue",
+                        }
+                      }).showToast();
+                    $(element).toggleClass('active');
+
+                    // do something with the response data
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(errorThrown);
+                    // handle the error case
+                }
+            });
+        }
+
+    </script>
+
+    {% block extra_js %} {% endblock extra_js %}
+
+    {% block extra_js_no_compress %} {% endblock extra_js_no_compress %}
+
+    {% include 'messages.html' %}
+</div>
+</body>
+
+</html>
