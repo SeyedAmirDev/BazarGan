@@ -4,9 +4,11 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.tokens import default_token_generator
 
 from .validators import validate_iranian_phone_number
 from .managers import UserManager
+from .utils import decode_uid
 
 
 class UserType(models.IntegerChoices):
@@ -19,7 +21,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     """
     Custom user model for our app
     """
-
     email = models.EmailField(max_length=255, unique=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

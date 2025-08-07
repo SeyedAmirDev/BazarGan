@@ -2,6 +2,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 
 from . import utils
+from .tokens import activation_token_generator
+
 from django.conf import settings
 from django.core import mail
 from django.template.context import make_context
@@ -108,27 +110,28 @@ class BaseTemplateEmail(BaseEmailMessage):
         return context
 
 
-class ActivationEmail(BaseTemplateEmail):
-    template_name = "email/activation.html"
+class PasswordResetOtpEmail(BaseTemplateEmail):
+    template_name = "email/password_reset_otp.html"
 
     def get_context_data(self):
         context = super().get_context_data()
+        otp = context.get("otp")
         user = context.get("user")
         context["uid"] = utils.encode_uid(user.pk)
         context["token"] = default_token_generator.make_token(user)
+        context['code'] = otp['code']
+        context['timeout'] = otp['instance'].timeout
         return context
 
-
-class ConfirmationEmail(BaseTemplateEmail):
-    template_name = "email/confirmation.html"
-
-
-class PasswordResetEmail(BaseTemplateEmail):
-    template_name = "email/password_reset.html"
+class ActivationOtpEmail(BaseTemplateEmail):
+    template_name = "email/activation_otp.html"
 
     def get_context_data(self):
         context = super().get_context_data()
+        otp = context.get("otp")
         user = context.get("user")
         context["uid"] = utils.encode_uid(user.pk)
-        context["token"] = default_token_generator.make_token(user)
+        context["token"] = activation_token_generator.make_token(user)
+        context['code'] = otp['code']
+        context['timeout'] = otp['instance'].timeout
         return context

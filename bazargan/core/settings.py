@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'website',
-    'accounts'
+    'accounts',
+    'otp'
 ]
 
 MIDDLEWARE = [
@@ -150,5 +151,5 @@ EMAIL_PORT = config("EMAIL_PORT", cast=int, default=25)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 
-PASSWORD_RESET_TIMEOUT=600
+PASSWORD_RESET_TIMEOUT=24 * 60 * 60
 ACTIVATION_ACCOUNT_TIMEOUT=24 * 60 * 60

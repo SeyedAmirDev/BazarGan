@@ -572,6 +572,8 @@
 </div>
 
 
+
+
   <!-- Alternate Options -->
   <div class="text-center mt-3" style="font-size: 1.1rem;">
     <a href="#" class="fw-bold text-decoration-none">تغییر شماره همراه</a>
@@ -579,7 +581,105 @@
     <a href="#" class="fw-bold text-decoration-none">ثبت‌نام با ایمیل</a>
   </div>
 </div>
+                <!-- مرحله 3: تنظیم رمز عبور جدید -->
+        <div id="resetPasswordStep3" style="display: none;">
+          <p class="text-center">لطفاً رمز عبور جدید خود را وارد کنید</p>
+          <form id="newPasswordForm">
+            {% csrf_token %}
+            <input type="hidden" id="verificationCode" name="code">
+            <input type="hidden" id="verificationEmail" name="email">
 
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">رمز عبور جدید</label>
+              <input type="password" class="form-control" id="newPassword" name="password1" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label">تکرار رمز عبور جدید</label>
+              <input type="password" class="form-control" id="confirmPassword" name="password2" required>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">تغییر رمز عبور</button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- New User Verification Modal -->
+<div class="modal fade" id="newUserModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">تایید کاربر جدید</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Step 1: OTP Verification -->
+        <div id="verificationStep1">
+          <p class="text-center">کد تأیید به ایمیل <span id="userEmailDisplay" class="fw-bold"></span> ارسال شد.</p>
+
+          <form id="AccountOtpForm" class="text-center">
+            {% csrf_token %}
+            <input type="hidden" id="userEmail" name="email">
+
+            <!-- OTP Input Fields -->
+<div class="d-flex justify-content-center gap-2 mb-3" dir="ltr">
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp1" required autofocus>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp2" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp3" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp4" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp5" required>
+  <input type="text" maxlength="1" class="form-control text-center otp-input" name="otp6" required>
+</div>
+
+            <!-- Confirm button -->
+            <div class="d-grid gap-2 mb-2">
+              <button type="submit" class="btn btn-primary">تأیید</button>
+            </div>
+          </form>
+
+          <!-- Resend Code and Timer -->
+          <div class="text-center mb-3">
+            <span id="ActivationOtpTimer" style="color: #0d6efd;"></span>
+          </div>
+
+          <!-- Alternate Options -->
+          <div class="text-center mt-3" style="font-size: 1.1rem;">
+            <a href="#" class="fw-bold text-decoration-none">تغییر ایمیل</a>
+            <span class="mx-2">یا</span>
+            <a href="#" class="fw-bold text-decoration-none">ورود به حساب کاربری</a>
+          </div>
+        </div>
+
+        <!-- Step 2: Set Password -->
+        <div id="verificationStep2" style="display: none;">
+          <p class="text-center">لطفاً رمز عبور خود را تنظیم کنید</p>
+          <form id="setPasswordForm">
+            {% csrf_token %}
+            <input type="hidden" id="AccountVerificationCode" name="code">
+            <input type="hidden" id="AccountVerificationEmail" name="email">
+
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">رمز عبور</label>
+              <input type="password" class="form-control" id="AccountPassword" name="password1" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label">تکرار رمز عبور</label>
+              <input type="password" class="form-control" id="AccountconfirmPassword" name="password2" required>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">ثبت نام</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -636,15 +736,25 @@
   });
 </script>
 
-<script>
+  <script>
+    /**
+ * Authentication System JavaScript
+ * Handles login, registration, password reset, and OTP verification
+ */
+
 $(document).ready(function() {
-  // نمایش مدال ایمیل هنگام کلیک روی دکمه ورود
+
+  // ======================
+  // LOGIN FLOW
+  // ======================
+
+  // Show email modal when login button is clicked
   $('a[href="{% url 'accounts:login' %}"]').on('click', function(e) {
     e.preventDefault();
     $('#loginEmailModal').modal('show');
   });
 
-  // مدیریت فرم ایمیل
+  // Handle email form submission
   $('#emailForm').on('submit', function(e) {
     e.preventDefault();
     const email = $('#loginEmail').val();
@@ -657,33 +767,32 @@ $(document).ready(function() {
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
       success: function(response) {
-        if (response.data.action == 'get-password') {
+        $('#loginEmailModal').modal('hide');
 
-          $('#loginEmailModal').modal('hide');
+        if (response.data.action === 'get-password') {
+          // Existing user - show password modal
           $('#passwordEmail').val(email);
           $('#loginPasswordModal').modal('show');
         } else {
-        console.log(response)
-          $('#loginEmailModal').modal('hide');
-          $('#passwordEmail').val(email);
-          $('#loginPasswordModal').modal('show');
+          // New user - show registration modal
+          $('#userEmail').val(email);
+          $('#userEmailDisplay').text(email);
+          $('#newUserModal').modal('show');
+          startActivationTimer(response.data.timer);
+          console.log(response.data.timer)
         }
       },
-      error: function(xhr, status, error) {
-        Toastify({
-          text: "خطا در ارتباط با سرور",
-          className: "error",
-          style: { background: "red" }
-        }).showToast();
+      error: function() {
+        showToast("خطا در ارتباط با سرور", "error");
       }
     });
   });
 
-  // مدیریت فرم پسورد
+  // Handle password form submission
   $('#passwordForm').on('submit', function(e) {
     e.preventDefault();
     const email = $('#passwordEmail').val();
-    const password = $('#password').val()
+    const password = $('#password').val();
 
     $.ajax({
       url: `{% url 'accounts:login' %}`,
@@ -693,20 +802,21 @@ $(document).ready(function() {
         password: password,
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
-      success: function(response) {
+      success: function() {
         sessionStorage.setItem("loginSuccess", "true");
-        window.location.href='/'
+        window.location.href = '/';
       },
-      error: function(xhr, status, error) {
-         Toastify({
-          text: "نام کاربری یا رمز عبور اشتباه است.",
-          className: "error",
-          style: { background: "red" }
-        }).showToast();
+      error: function() {
+        showToast("نام کاربری یا رمز عبور اشتباه است.", "error");
       }
     });
   });
-  // لینک فراموشی رمز عبور
+
+  // ======================
+  // PASSWORD RESET FLOW
+  // ======================
+
+  // Forgot password link
   $('#forgotPasswordLink').on('click', function(e) {
     e.preventDefault();
     const email = $('#passwordEmail').val();
@@ -714,158 +824,310 @@ $(document).ready(function() {
     $('#loginPasswordModal').modal('hide');
     $('#resetPasswordModal').modal('show');
   });
-let timer = 120;
+
+  // Password reset form (Step 1: Send OTP)
+  $('#resetPasswordForm').on('submit', function(e) {
+    e.preventDefault();
+    const email = $('#resetEmail').val();
+
+    $.ajax({
+      url: `{% url 'accounts:password_reset_otp' %}`,
+      method: 'POST',
+      data: {
+        email: email,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(response) {
+        $('#otpEmail').val(email);
+        $('#resetEmailDisplay').text(email);
+        $('#resetPasswordStep1').hide();
+        $('#resetPasswordStep2').show();
+
+        startTimer(response.data.timer);
+        $('.otp-input').first().focus();
+        showToast(response.message, "success");
+      },
+      error: function(xhr) {
+        const message = xhr.responseJSON?.message || "خطا در ارسال کد تأیید";
+        showToast(message, "error");
+      }
+    });
+  });
+
+  // OTP verification form (Step 2)
+  $('#otpForm').on('submit', function(e) {
+    e.preventDefault();
+    const otp = collectOtpValues();
+    const email = $('#otpEmail').val();
+
+    $.ajax({
+      url: `{% url 'accounts:password_reset_otp_verify' %}`,
+      method: 'POST',
+      data: {
+        email: email,
+        otp: otp,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(response) {
+        if (response.status === 'success') {
+          $('#verificationEmail').val(email);
+          $('#verificationCode').val(response.data.code);
+          $('#resetPasswordStep2').hide();
+          $('#resetPasswordStep3').show();
+        }
+      },
+      error: function(xhr) {
+        const message = xhr.responseJSON?.message || "کد تأیید نامعتبر است";
+        showToast(message, "error");
+      }
+    });
+  });
+
+  // New password form (Step 3)
+  $('#resetPasswordStep3').on('submit', function(e) {
+    e.preventDefault();
+    const password1 = $('#newPassword').val();
+    const password2 = $('#confirmPassword').val();
+    const email = $('#verificationEmail').val();
+    const code = $('#verificationCode').val();
+
+    $.ajax({
+      url: `{% url 'accounts:password_reset_otp_complete' %}`,
+      method: 'POST',
+      data: {
+        email: email,
+        code: code,
+        password1: password1,
+        password2: password2,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function() {
+        sessionStorage.setItem("loginSuccess", "true");
+        window.location.href = '/';
+      },
+      error: function(xhr) {
+        const message = xhr.responseJSON?.message || "خطا در تغییر رمز عبور";
+        showToast(message, "error");
+      }
+    });
+  });
+
+  // ======================
+  // ACCOUNT ACTIVATION FLOW
+  // ======================
+
+  // Account OTP verification
+  $('#AccountOtpForm').on('submit', function(e) {
+    e.preventDefault();
+    const otp = collectOtpValues();
+    const email = $('#userEmail').val();
+
+    $.ajax({
+      url: `{% url 'accounts:activation_otp_verify' %}`,
+      method: 'POST',
+      data: {
+        email: email,
+        otp: otp,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(response) {
+        if (response.status === 'success') {
+          $('#AccountVerificationEmail').val(email);
+          $('#AccountVerificationCode').val(response.data.code);
+          $('#verificationStep1').hide();
+          $('#verificationStep2').show();
+        }
+      },
+      error: function(xhr) {
+        const message = xhr.responseJSON?.message || "کد تأیید نامعتبر است";
+        showToast(message, "error");
+      }
+    });
+  });
+
+  // Set password form for new accounts
+  $('#setPasswordForm').on('submit', function(e) {
+    e.preventDefault();
+    const password1 = $('#AccountPassword').val();
+    const password2 = $('#AccountconfirmPassword').val();
+    const email = $('#AccountVerificationEmail').val();
+    const code = $('#AccountVerificationCode').val();
+
+    $.ajax({
+      url: `{% url 'accounts:activation_otp_complete' %}`,
+      method: 'POST',
+      data: {
+        email: email,
+        code: code,
+        password1: password1,
+        password2: password2,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function() {
+        sessionStorage.setItem("loginSuccess", "true");
+        window.location.href = '/';
+      },
+      error: function(xhr) {
+        const message = xhr.responseJSON?.message || "خطا در ایجاد حساب کاربری";
+        showToast(message, "error");
+      }
+    });
+  });
+
+});
+
+// ======================
+// TIMER FUNCTIONS
+// ======================
+
+// let timer = 120;
 let interval;
 
-function startTimer() {
+function startTimer(timer) {
   clearInterval(interval);
-  timer = 10;
 
-  // نمایش متن اولیه تایمر
-  $('#otpTimer')
-    .text(`${timer} ثانیه تا امکان ارسال مجدد کد`)
-    .css('text-decoration', 'none')
-    .css('cursor', 'default')
-    .off('click'); // اطمینان از غیرفعال بودن کلیک
+  updateTimerDisplay('#otpTimer', false, timer);
 
   interval = setInterval(() => {
     timer--;
-    $('#otpTimer').text(`${timer} ثانیه تا امکان ارسال مجدد کد`);
+    updateTimerDisplay('#otpTimer', timer <= 0, timer);
 
     if (timer <= 0) {
       clearInterval(interval);
-
-      // تبدیل به لینک قابل کلیک
-      $('#otpTimer')
-        .text('ارسال مجدد کد')
-        .css('text-decoration', 'underline')
-        .css('cursor', 'pointer')
-        .off('click') // اطمینان از حذف کلیک‌های قبلی
-        .on('click', resendOtp);
+      makeTimerClickable('#otpTimer', resendOtp);
     }
   }, 1000);
 }
+
+function startActivationTimer(timer) {
+  clearInterval(interval);
+
+  updateTimerDisplay('#ActivationOtpTimer', false, timer);
+
+  interval = setInterval(() => {
+    timer--;
+    updateTimerDisplay('#ActivationOtpTimer', timer <= 0, timer);
+
+    if (timer <= 0) {
+      clearInterval(interval);
+      makeTimerClickable('#ActivationOtpTimer', resendActivationOtp);
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay(selector, isClickable, timerValue) {
+  const $element = $(selector);
+
+  if (isClickable) {
+    $element
+      .text('ارسال مجدد کد')
+      .css({
+        'text-decoration': 'underline',
+        'cursor': 'pointer'
+      });
+  } else {
+    $element
+      .text(`${timerValue} ثانیه تا امکان ارسال مجدد کد`)
+      .css({
+        'text-decoration': 'none',
+        'cursor': 'default'
+      })
+      .off('click');
+  }
+}
+
+
+function makeTimerClickable(selector, clickHandler) {
+  $(selector)
+    .off('click')
+    .on('click', clickHandler);
+}
+
+// ======================
+// RESEND OTP FUNCTIONS
+// ======================
 
 function resendOtp() {
   const email = $('#otpEmail').val();
 
   $.ajax({
-    url: `{% url 'accounts:password_reset' %}`,
+    url: `{% url 'accounts:password_reset_otp' %}`,
     method: 'POST',
     data: {
       email: email,
       csrfmiddlewaretoken: '{{ csrf_token }}'
     },
     success: function(response) {
-      Toastify({
-        text: "کد تأیید جدید به ایمیل شما ارسال شد",
-        className: "success",
-        style: { background: "green" }
-      }).showToast();
+      showToast(response.message, "success");
+      startTimer(response.data.timer);
     },
-    error: function(xhr, status, error) {
-      Toastify({
-        text: xhr.responseJSON?.message || "خطا در ارسال کد تأیید",
-        className: "error",
-        style: { background: "red" }
-      }).showToast();
+    error: function(response) {
+      const message = response.message;
+      showToast(message, "error");
     }
   });
-
-  // بازگشت به حالت تایمر
-  startTimer();
 }
 
-  // مدیریت فرم بازیابی رمز عبور (مرحله 1)
- $('#resetPasswordForm').on('submit', function(e) {
-  e.preventDefault();
-  const email = $('#resetEmail').val();
+function resendActivationOtp() {
+  const email = $('#userEmail').val();
 
   $.ajax({
-    url: `{% url 'accounts:password_reset' %}`,
+    url: `{% url 'accounts:activation_otp' %}`,
     method: 'POST',
     data: {
       email: email,
       csrfmiddlewaretoken: '{{ csrf_token }}'
     },
     success: function(response) {
-      $('#otpEmail').val(email);
-      $('#resetEmailDisplay').text(email);
-      $('#resetPasswordStep1').hide();
-      $('#resetPasswordStep2').show();
-
-      // ✅ شروع تایمر از اینجا
-      startTimer();
-
-      // ✅ فوکوس روی فیلد اول OTP
-      $('.otp-input').first().focus();
-
-      Toastify({
-        text: "کد تأیید به ایمیل شما ارسال شد",
-        className: "success",
-        style: { background: "green" }
-      }).showToast();
+      showToast(response.message, "success");
+      startActivationTimer(response.data.timer);
     },
-    error: function(xhr, status, error) {
-      Toastify({
-        text: xhr.responseJSON?.message || "خطا در ارسال کد تأیید",
-        className: "error",
-        style: { background: "red" }
-      }).showToast();
+    error: function(error) {
+      const message = error.message;
+      showToast(message, "error");
     }
   });
-});
+}
 
-  // مدیریت فرم OTP
-  $('#otpForm').on('submit', function(e) {
-    e.preventDefault();
-    const formData = $(this).serialize();
+// ======================
+// UTILITY FUNCTIONS
+// ======================
 
-    $.ajax({
-      url: $(this).attr('action'),
-      method: 'POST',
-      data: formData,
-      success: function(response) {
-        if (response.success) {
-          Toastify({
-            text: "رمز عبور با موفقیت تغییر یافت",
-            className: "success",
-            style: { background: "green" }
-          }).showToast();
-
-          setTimeout(function() {
-            $('#resetPasswordModal').modal('hide');
-            window.location.reload();
-          }, 1500);
-        }
-      },
-      error: function(xhr, status, error) {
-        Toastify({
-          text: xhr.responseJSON?.message || "خطا در تغییر رمز عبور",
-          className: "error",
-          style: { background: "red" }
-        }).showToast();
-      }
-    });
+function collectOtpValues() {
+  let otp = "";
+  document.querySelectorAll(".otp-input").forEach(input => {
+    otp += input.value;
   });
-});
-</script>
-  <script>
-document.addEventListener("DOMContentLoaded", function () {
-  if (sessionStorage.getItem("loginSuccess") === "true") {
-    Toastify({
-      text: "با موفقیت وارد شدید!",
-      duration: 3000,
-      gravity: "top", // یا bottom
-      position: "right", // یا left
-      backgroundColor: "#4CAF50", // رنگ سبز موفقیت
-      close: true,
-    }).showToast();
+  return otp;
+}
 
+function showToast(message, type) {
+  const backgroundColor = type === "success" ? "#4CAF50" : "#f44336";
+
+  Toastify({
+    text: message,
+    className: type,
+    style: {
+      background: backgroundColor
+    },
+    duration: 3000,
+    gravity: "top",
+    position: "right",
+    close: true
+  }).showToast();
+}
+
+// ======================
+// SUCCESS MESSAGE ON PAGE LOAD
+// ======================
+
+document.addEventListener("DOMContentLoaded", function() {
+  if (sessionStorage.getItem("loginSuccess") === "true") {
+    showToast("با موفقیت وارد شدید!", "success");
     sessionStorage.removeItem("loginSuccess");
   }
 });
-</script>
+  </script>
   <!-- JS Plugins Init. -->
   <script>
     (function () {

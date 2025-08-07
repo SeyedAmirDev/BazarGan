@@ -1,41 +1,88 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends 'base.html' %}
+{% load i18n static %}
 
 {% block content %}
-<div class="container my-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      {% if validlink %}
-        <!-- حالت موفق -->
-        <div class="text-center p-4 border rounded bg-white">
-          <div class="mb-4">
-            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
-          </div>
-          <h2 class="mb-3">فعال‌سازی موفق</h2>
-          <p class="mb-4">حساب کاربری شما با موفقیت فعال شد.</p>
-          <a href="{% url 'accounts:login' %}" class="btn btn-primary">
-            <i class="bi bi-box-arrow-in-left"></i> ورود به حساب
-          </a>
+{% if validlink %}
+
+    <!-- پیام موفقیت فعال‌سازی -->
+    <div class="container content-space-1">
+        <div class="text-center">
+            <p class="lead">لطفاً رمز عبور خود را تنظیم کنید تا فرآیند فعال‌سازی تکمیل شود.</p>
         </div>
-      {% else %}
-        <!-- حالت ناموفق -->
-        <div class="text-center p-4 border rounded bg-whi">
-          <div class="mb-4">
-            <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
-          </div>
-          <h2 class="mb-3">خطا در فعال‌سازی</h2>
-          <p class="mb-4">لینک فعال‌سازی نامعتبر یا منقضی شده است.</p>
-          <div class="d-flex justify-content-center gap-2">
-            <a href="{% url 'accounts:register' %}" class="btn btn-primary">
-              <i class="bi bi-person-plus"></i> ثبت‌نام مجدد
-            </a>
-            <a href="{% url 'website:contact' %}" class="btn btn-outline-secondary">
-              <i class="bi bi-headset"></i> پشتیبانی
-            </a>
-          </div>
-        </div>
-      {% endif %}
     </div>
-  </div>
-</div>
+
+    <!-- فرم تنظیم رمز عبور -->
+    <div class="container content-space-b-lg-3">
+        <div class="flex-grow-1 mx-auto" style="max-width: 28rem;">
+            <!-- فرم -->
+            <form class="js-validate needs-validation" method="post" novalidate>
+                {% csrf_token %}
+
+                <!-- فیلد رمز عبور جدید -->
+                <div class="mb-3">
+                    <label class="form-label" for="id_new_password1">رمز عبور جدید</label>
+                    <div class="input-group input-group-merge" data-hs-validation-validate-class>
+                        <input type="password" class="js-toggle-password form-control form-control-lg"
+                               name="new_password1" id="id_new_password1"
+                               placeholder="رمز عبور جدید خود را وارد کنید"
+                               aria-label="رمز عبور جدید" required
+                               data-hs-toggle-password-options='{
+                                    "target": [".js-toggle-password-target-1", ".js-toggle-password-target-2"],
+                                    "defaultClass": "bi-eye-slash",
+                                    "showClass": "bi-eye",
+                                    "classChangeTarget": ".js-toggle-passowrd-show-icon-1"
+                               }'>
+                        <a class="js-toggle-password-target-1 input-group-append input-group-text" href="javascript:;">
+                            <i class="js-toggle-passowrd-show-icon-1 bi-eye"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- فیلد تأیید رمز عبور -->
+                <div class="mb-4">
+                    <label class="form-label" for="id_new_password2">تکرار رمز عبور</label>
+                    <div class="input-group input-group-merge" data-hs-validation-validate-class>
+                        <input type="password" class="js-toggle-password form-control form-control-lg"
+                               name="new_password2" id="id_new_password2"
+                               placeholder="رمز عبور را مجدداً وارد کنید"
+                               aria-label="تکرار رمز عبور" required
+                               data-hs-validation-equal-field="#password1"
+                               data-hs-toggle-password-options='{
+                                    "target": [".js-toggle-password-target-1", ".js-toggle-password-target-2"],
+                                    "defaultClass": "bi-eye-slash",
+                                    "showClass": "bi-eye",
+                                    "classChangeTarget": ".js-toggle-passowrd-show-icon-2"
+                               }'>
+                        <a class="js-toggle-password-target-2 input-group-append input-group-text" href="javascript:;">
+                            <i class="js-toggle-passowrd-show-icon-2 bi-eye"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        تنظیم رمز عبور
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% else %}
+    <!-- بخش لینک نامعتبر -->
+    <div class="container content-space-3">
+        <div class="text-center">
+            <div class="mb-3">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-danger">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+            </div>
+            <h1 class="h2 text-danger">لینک فعال‌سازی نامعتبر است</h1>
+            <p class="lead mt-3">لینک فعال‌سازی شما نامعتبر یا منقضی شده است.</p>
+            <p class="mb-4">لطفاً ایمیل خود را برای لینک فعال‌سازی معتبر بررسی کنید</p>
+        </div>
+    </div>
+{% endif %}
 {% endblock %}

@@ -1,5 +1,6 @@
 import threading
 
+from django.conf import settings
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
@@ -20,3 +21,9 @@ def encode_uid(pk):
 
 def decode_uid(pk):
     return force_str(urlsafe_base64_decode(pk))
+
+def activation_token_expiry_hours():
+    return getattr(settings, "ACTIVATION_ACCOUNT_TIMEOUT", 24 * 60 * 60) // 60 * 60
+
+def reset_token_expiry_hours():
+    return getattr(settings, "RESET_ACCOUNT_TIMEOUT", 24 * 60 * 60) // 60 * 60
