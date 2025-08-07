@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load shop_tags %}
 {% block title %} Bazargan - Home Page{% endblock title %}
 {% block content %}
     <div class="position-relative">
@@ -374,6 +375,8 @@
       </div>
     </div>
     <!-- End Card Grid -->
+
+    {% show_latest_products %}
 
     <!-- Subscribe -->
     <div class="bg-light">
