@@ -112,9 +112,9 @@
 <!--                            <span class="cart-item-count ">3</span>-->
 <!--                          </button>-->
 
-                          <a href="" type="button" class="btn btn-ghost-secondary btn-icon">
+                          <a href="{% url 'cart:cart-summary' %}" type="button" class="btn btn-ghost-secondary btn-icon">
                             <i class="bi-basket"></i>
-                            <span class="cart-item-count" id="total-cart-item-count"></span>
+                            <span class="cart-item-count" id="total-cart-item-count">{% if cart|length > 0 %} {{cart|length}} {% endif %}</span>
                           </a>
                           <!-- End Shopping Cart -->
                             {% if request.user.is_authenticated %}
@@ -1259,7 +1259,7 @@ document.addEventListener("DOMContentLoaded", function() {
         function addToCart(product_id) {
 
             $.ajax({
-                url: "",
+                url: "{% url 'cart:session-add-product' %}",
                 // url: "",
                 method: 'POST',
                 data: {

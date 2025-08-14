@@ -210,7 +210,7 @@
           <!-- End Accordion -->
 
           <div class="d-grid mb-4">
-            <button type="button" class="btn btn-primary btntransition">افزودن به سبد خرید</button>
+<button type="button" class="btn btn-primary btntransition" id="add-to-cart-btn" data-product-id="{{ object.id }}">افزودن به سبد خرید</button>
           </div>
 
           <!-- Media -->
@@ -619,3 +619,85 @@
     </div>
     <!-- End Subscribe -->
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // انتخاب عناصر با دقت بیشتر
+    const quantityInput = document.querySelector('.js-quantity-counter .js-result');
+    const plusBtn = document.querySelector('.js-quantity-counter .js-plus');
+    const minusBtn = document.querySelector('.js-quantity-counter .js-minus');
+    const addToCartBtn = document.getElementById('add-to-cart-btn');
+
+    // مقدار stock را مستقیماً از دیتا-اَتریب بگیرید
+    const productStock = parseInt('{{ object.stock }}');
+
+    // تابع برای مدیریت افزایش
+    const handlePlusClick = () => {
+        const currentValue = parseInt(quantityInput.value) || 1;
+        quantityInput.value = Math.min(currentValue + 1, productStock);
+    };
+
+    // تابع برای مدیریت کاهش
+    const handleMinusClick = () => {
+        const currentValue = parseInt(quantityInput.value) || 1;
+        quantityInput.value = Math.max(currentValue - 1, 1);
+    };
+
+    // حذف اول همه event listenerهای قبلی
+    plusBtn.replaceWith(plusBtn.cloneNode(true));
+    minusBtn.replaceWith(minusBtn.cloneNode(true));
+
+    // انتخاب مجدد عناصر بعد از clone
+    const newPlusBtn = document.querySelector('.js-quantity-counter .js-plus');
+    const newMinusBtn = document.querySelector('.js-quantity-counter .js-minus');
+
+    // ثبت event listenerهای جدید (فقط یک بار)
+    newPlusBtn.addEventListener('click', handlePlusClick, {once: false});
+    newMinusBtn.addEventListener('click', handleMinusClick, {once: false});
+
+    // اعتبارسنجی مقدار ورودی
+    quantityInput.addEventListener('change', function() {
+        let value = parseInt(this.value) || 1;
+        this.value = Math.min(Math.max(value, 1), productStock);
+    });
+
+    // مدیریت افزودن به سبد خرید
+    addToCartBtn.addEventListener('click', function() {
+        const quantity = parseInt(quantityInput.value) || 1;
+
+        if (quantity > productStock) {
+            alert(`حداکثر تعداد قابل سفارش ${productStock} عدد است`);
+            return;
+        }
+
+      $.ajax({
+                url: "{% url 'cart:session-update-product-quantity' %}",
+                method: 'POST',
+                data: {
+                    product_id: {{ object.id }},
+                    quantity: quantity,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    $("#total-cart-item-count").html(response.total_quantity)
+                    Toastify({
+                        text:'با موفقیت اضافه شد.',
+                        className: `info`,
+                        style: {
+                          background: "blue",
+                        }
+                      }).showToast();
+                    $(element).toggleClass('active');
+
+                    // do something with the response data
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(errorThrown);
+                    // handle the error case
+                }
+         });
+    });
+});
+</script>
+{% endblock %}

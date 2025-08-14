@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'website',
     'accounts',
     'otp',
-    'shop'
+    'shop',
+    'cart'
 ]
 
 MIDDLEWARE = [
@@ -66,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'cart.context_processors.cart_processor',
             ],
         },
     },
@@ -152,5 +154,9 @@ EMAIL_PORT = config("EMAIL_PORT", cast=int, default=25)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 
+# password reset and activation configuration
 PASSWORD_RESET_TIMEOUT=24 * 60 * 60
 ACTIVATION_ACCOUNT_TIMEOUT=24 * 60 * 60
+
+# cart configuration
+CART_SESSION_ID = 'cart'
